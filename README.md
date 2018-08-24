@@ -135,7 +135,7 @@ http://HOST/S2-057-2-3-34/POC/actionChain1.action
 
 验证在返回头Location里，回显在body里
 
-
+![image](https://github.com/Fnzer0/S2-057-poc/blob/master/Redirect-dir.jpg)
 
 2.Chain action
 
@@ -143,13 +143,15 @@ http://HOST/S2-057-2-3-34/POC/actionChain2.action
 
 无回显，无跳转，命令执行成功，回显在body里
 
-
+![image](https://github.com/Fnzer0/S2-057-poc/blob/master/Chain-dir.jpg)
 
 3.Postback action
 
 http://HOST/S2-057-2-3-34/POC/actionChain3.action
 
 验证和回显都在body，form的形式
+
+![image](https://github.com/Fnzer0/S2-057-poc/blob/master/Postback-echo.jpg)
 
 ## 参考
 
@@ -164,4 +166,4 @@ https://github.com/jas502n/St2-057
 ## TODO
 
 1. Struts 2.5.16 poc
-2. 通用检测脚本，发现有的脚本只检测了Redirect action的情况
+2. 通用检测脚本，发现有的脚本只检测了Redirect action的情况，看大佬们的介绍应该还存在其他情况
