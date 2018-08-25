@@ -6,17 +6,17 @@
 <struts>
 	<package name="actionchaining" extends="struts-default">
 		<action name="actionChain1" class="org.apache.struts2.showcase.actionchaining.ActionChain1">
-			<result type="chain">
-                <param name = "actionName">register2</param>
-            </result>
+		<result type="chain">
+                	<param name = "actionName">register2</param>
+            	</result>
 		</action>
 		<action name="actionChain2" class="org.apache.struts2.showcase.actionchaining.ActionChain2">
-			<result type="chain">xxx</result>
+		<result type="chain">xxx</result>
 		</action>
 		<action name="actionChain3" class="org.apache.struts2.showcase.actionchaining.ActionChain3">
-			<result type="postback">
-                <param name = "actionName">register2</param>
-            </result>
+		<result type="postback">
+               		<param name = "actionName">register2</param>
+            	</result>
 		</action>
 	</package>
 </struts>
