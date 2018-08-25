@@ -11,7 +11,7 @@
             </result>
 		</action>
 		<action name="actionChain2" class="org.apache.struts2.showcase.actionchaining.ActionChain2">
-			<result type="chain">actionChain3</result>
+			<result type="chain">xxx</result>
 		</action>
 		<action name="actionChain3" class="org.apache.struts2.showcase.actionchaining.ActionChain3">
 			<result type="postback">
