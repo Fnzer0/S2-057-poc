@@ -52,7 +52,7 @@ tomcat+war即可
 <struts>
 	<package name="actionchaining" extends="struts-default">
 		<action name="actionChain1" class="org.apache.struts2.showcase.actionchaining.ActionChain1">
-			<result type="chain">
+			<result type="redirectAction">
 				<param name = "actionName">register2</param>
 			</result>
 		</action>
